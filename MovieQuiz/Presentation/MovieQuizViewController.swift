@@ -8,17 +8,17 @@ final class MovieQuizViewController: UIViewController {
     
     //Структура  вопроса: картинка, текст к ней и булево значение
     
-    struct QuizQuestion {
+    private struct QuizQuestion {
         let image: String
         let text: String
         let correctAnswer: Bool
     }
-    struct QuizStepViewModel {
+    private struct QuizStepViewModel {
         let image: UIImage
         let question: String
         let questionNumber: String
     }
-    struct QuizResultsViewModel {
+    private struct QuizResultsViewModel {
         /// строка с заголовком алерта
         let title: String
         /// строка с текстом о количестве набранных очков
@@ -29,7 +29,7 @@ final class MovieQuizViewController: UIViewController {
     
     //Перечень ответов
     
-    let questions: [QuizQuestion] = [
+    private let questions: [QuizQuestion] = [
         QuizQuestion(image: "Deadpool",
                      text: "Рейтинг этого фильма больше чем 6?",
                      correctAnswer: true),
