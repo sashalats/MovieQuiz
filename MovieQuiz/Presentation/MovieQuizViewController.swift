@@ -5,6 +5,8 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
     
     //Структура  вопроса: картинка, текст к ней и булево значение
     
@@ -19,11 +21,8 @@ final class MovieQuizViewController: UIViewController {
         let questionNumber: String
     }
     private struct QuizResultsViewModel {
-        /// строка с заголовком алерта
         let title: String
-        /// строка с текстом о количестве набранных очков
         let text: String
-        /// текст для кнопки алерта
         let buttonText: String
     }
     
@@ -111,7 +110,6 @@ final class MovieQuizViewController: UIViewController {
         }
         
         alert.addAction(action)
-        
         self.present(alert, animated: true, completion: nil)
     }
     
@@ -128,7 +126,6 @@ final class MovieQuizViewController: UIViewController {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
-            
             let nextQuestion = questions[currentQuestionIndex]
             let viewModel = convert(model: nextQuestion)
             show(quiz: viewModel)
@@ -138,7 +135,6 @@ final class MovieQuizViewController: UIViewController {
     // приватный метод, который меняет цвет рамки
     
     private func showAnswerResult(isCorrect: Bool) {
-        
         if isCorrect {
             correctAnswers += 1
         }
@@ -152,22 +148,32 @@ final class MovieQuizViewController: UIViewController {
             self.imageView.layer.borderWidth = .zero
             self.imageView.layer.borderColor = UIColor.clear.cgColor
             self.showNextQuestionOrResults()
+            
+            // Включаем кнопки снова после обработки ответа
+            self.yesButton.isEnabled = true
+            self.noButton.isEnabled = true
         }
     }
-
-    ///Экшены для кнопок
     
+    // Обработчик для ответа на вопрос и отключение кнопок
+    private func handleAnswer(givenAnswer: Bool) {
+        // Отключаем кнопки, чтобы предотвратить множественные нажатия
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
+        
+        let currentQuestion = questions[currentQuestionIndex]
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    // Экшены для кнопок
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = true
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        handleAnswer(givenAnswer: true)
     }
+    
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = false
-        
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        handleAnswer(givenAnswer: false)
     }
+    
+    
     
 }
