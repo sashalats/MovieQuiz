@@ -16,11 +16,13 @@ class StatisticService: StatisticServiceProtocol {
     
     var gamesCount: Int {
         get {
+            
             // Добавьте чтение значения из UserDefaults
             
             return storage.integer(forKey: Keys.gamesCount.rawValue)
         }
         set {
+            
             // Добавьте запись значения newValue из UserDefaults
             
             storage.set(newValue, forKey: Keys.gamesCount.rawValue)
@@ -29,6 +31,7 @@ class StatisticService: StatisticServiceProtocol {
     
     var bestGame: GameResult {
         get {
+            
             // Добавьте чтение значений полей GameResult(correct, total и date) из UserDefaults,
             // затем создайте GameResult от полученных значений
             
@@ -38,6 +41,7 @@ class StatisticService: StatisticServiceProtocol {
             return GameResult(correct: correct, total: total, date: date)
         }
         set {
+            
             // Добавьте запись значений каждого поля из newValue из UserDefaults
             
             storage.set(newValue.correct, forKey: "correct")
@@ -57,6 +61,7 @@ class StatisticService: StatisticServiceProtocol {
     
     var totalAccuracy: Double {
         get {
+            
             // Высчитываем среднюю точность
             
             return (self.correctAllAnswers / (10.0 * Double(gamesCount))) * 100
@@ -64,6 +69,7 @@ class StatisticService: StatisticServiceProtocol {
     }
     
     func store(correct count: Int, total amount: Int) {
+        
         // Сохраняем количество игр
         
         gamesCount = gamesCount + 1

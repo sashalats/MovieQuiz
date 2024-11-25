@@ -6,6 +6,7 @@ struct GameResult {
     let date: Date
     
     //метод сравнения по количеству верных ответов
+    
     func isBetterThan(_ another: GameResult) -> Bool {
         return correct > another.correct
     }
