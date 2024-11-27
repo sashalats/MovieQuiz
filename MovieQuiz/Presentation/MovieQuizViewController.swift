@@ -8,8 +8,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
     
-    // Взаимодействие со счетчиком
-    
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
@@ -34,7 +32,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        // проверка, что вопрос не nil
         guard let question = question else {
             return
         }
@@ -45,9 +42,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self?.show(quiz: viewModel)
         }
     }
-    
-    //метод конвертации, который принимает моковый вопрос и возвращает вью модель
-    
+
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(named: model.image) ?? UIImage(),
@@ -56,14 +51,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         return questionStep
     }
     
-    // приватный метод вывода на экран вопроса
-    
     private func show(quiz step: QuizStepViewModel){
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber}
-    
-    // приватный метод для показа результатов раунда квиза
     
     private func show(quiz result: QuizResultsViewModel) {
         
@@ -71,21 +62,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             title: result.title,
             message: result.text,
             buttonText: result.buttonText,
-            completion: {
-                self.currentQuestionIndex = 0
-                self.correctAnswers = 0
-                
-                self.questionFactory?.requestNextQuestion()
+            completion: { [weak self] in
+                self?.currentQuestionIndex = 0
+                self?.correctAnswers = 0
+                self?.questionFactory?.requestNextQuestion()
             }
         );
-        
-        // Вызов показа алерта
+
         
         let alertPresenter = AlertPresenter(delegate: self)
         alertPresenter.showAlert(result: alert)
     }
-    
-    // приватный метод, который содержит логику перехода в один из сценариев.
     
     private func showNextQuestionOrResults() {
         if currentQuestionIndex == questionsAmount - 1 {
@@ -94,7 +81,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             guard let bestResult = statisticService?.bestGame.date.dateTimeString else {
                 return
             }
-            let text = "Ваш результат: \(correctAnswers) из 10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0) ( \(bestResult)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0))%"
+            let text = """
+            Ваш результат: \(correctAnswers) из 10
+            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+            Рекорд: \(statisticService?.bestGame.correct ?? 0) ( \(bestResult))
+            Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0))%
+            """
             
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",
@@ -107,8 +99,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.questionFactory?.requestNextQuestion()
         }
     }
-    
-    // приватный метод, который меняет цвет рамки
+
     
     private func showAnswerResult(isCorrect: Bool) {
         
@@ -120,24 +111,17 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.imageView.layer.borderWidth = .zero
             self.imageView.layer.borderColor = UIColor.clear.cgColor
             self.showNextQuestionOrResults()
             
-            // Включаем кнопки снова после обработки ответа
             self.yesButton.isEnabled = true
             self.noButton.isEnabled = true
         }
     }
     
-    
-    // Обработчик для ответа на вопрос и отключение кнопок
-    
     private func handleAnswer(givenAnswer: Bool) {
-        
-        // Отключаем кнопки, чтобы предотвратить множественные нажатия
         
         yesButton.isEnabled = false
         noButton.isEnabled = false
@@ -148,8 +132,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    
-    // Экшены для кнопок
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         handleAnswer(givenAnswer: true)
     }

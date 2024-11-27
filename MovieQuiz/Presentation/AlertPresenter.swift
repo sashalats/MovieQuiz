@@ -1,7 +1,7 @@
 import UIKit
 
 final class AlertPresenter: AlertPresenterProtocol {
-    private var delegate: UIViewController
+    weak private var delegate: UIViewController?
     
     init (delegate: UIViewController) {
         self.delegate = delegate
@@ -17,7 +17,6 @@ final class AlertPresenter: AlertPresenterProtocol {
         }
         
         alert.addAction(action)
-        
-        delegate.present(alert, animated: true, completion: nil)
+        delegate?.present(alert, animated: true, completion: nil)
     }
 }

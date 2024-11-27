@@ -4,7 +4,6 @@ class QuestionFactory: QuestionFactoryProtocol {
     func setup(delegate: QuestionFactoryDelegate) {
         self.delegate = delegate
     }
-    //Перечень ответов
     
     private let questions: [QuizQuestion] = [
         QuizQuestion(image: "Deadpool",
@@ -38,8 +37,6 @@ class QuestionFactory: QuestionFactoryProtocol {
                      text: "Рейтинг этого фильма больше чем 6?",
                      correctAnswer: false),
     ]
-    
-    //Функция показывает случайный вопрос из массива с вопросами
     
     func requestNextQuestion() {
         guard let index = (0..<questions.count) .randomElement() else {
