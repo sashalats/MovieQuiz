@@ -8,6 +8,11 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="YS Display-Medium.ttf">
+            <string>YSDisplay-Medium</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Movie Quiz View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -128,9 +133,11 @@
                     <connections>
                         <outlet property="counterLabel" destination="MqY-nA-Quz" id="Qwd-N0-gQG"/>
                         <outlet property="imageView" destination="ZUa-mc-vfW" id="GPT-q7-B4A"/>
-                        <outlet property="noButton" destination="4IA-PC-fAR" id="wOs-hb-JkM"/>
+
+                        <outlet property="noButton" destination="4IA-PC-fAR" id="XFp-xf-ekk"/>
                         <outlet property="textLabel" destination="BsD-mc-cfN" id="LFm-0O-HwA"/>
-                        <outlet property="yesButton" destination="rBS-Mr-Wh0" id="6SF-zJ-1cr"/>
+                        <outlet property="yesButton" destination="rBS-Mr-Wh0" id="OIe-5a-9Vx"/>
+                      
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
