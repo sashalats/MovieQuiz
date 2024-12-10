@@ -7,7 +7,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var yesButton: UIButton!
     @IBOutlet private var noButton: UIButton!
-    
+
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     
@@ -61,6 +61,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let alert = AlertModel(
             title: result.title,
             message: result.text,
+
             buttonText: result.buttonText,
             completion: { [weak self] in
                 self?.currentQuestionIndex = 0
@@ -95,14 +96,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
+
             
             self.questionFactory?.requestNextQuestion()
+
         }
     }
 
     
     private func showAnswerResult(isCorrect: Bool) {
-        
         if isCorrect {
             correctAnswers += 1
         }
@@ -116,11 +118,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.imageView.layer.borderColor = UIColor.clear.cgColor
             self.showNextQuestionOrResults()
             
+
             self.yesButton.isEnabled = true
             self.noButton.isEnabled = true
         }
     }
     
+
     private func handleAnswer(givenAnswer: Bool) {
         
         yesButton.isEnabled = false
@@ -132,6 +136,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
+
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         handleAnswer(givenAnswer: true)
     }
@@ -139,5 +144,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         handleAnswer(givenAnswer: false)
     }
+    
+    
     
 }
