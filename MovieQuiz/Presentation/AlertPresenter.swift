@@ -10,8 +10,11 @@ final class AlertPresenter: AlertPresenterProtocol {
         let alert = UIAlertController(
             title: result?.title,
             message: result?.message,
-            preferredStyle: .alert)
+            preferredStyle: .alert
+        )
         
+        alert.view.accessibilityIdentifier = "Game results"
+      
         let action = UIAlertAction(title: result?.buttonText, style: .cancel) { _ in
             result?.completion()
         }
