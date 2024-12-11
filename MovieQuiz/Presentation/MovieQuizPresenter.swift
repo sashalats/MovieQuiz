@@ -1,9 +1,3 @@
-//
-//  MovieQuizPresenter.swift
-//  MovieQuiz
-//
-//  Created by sashalats on 11.12.2024.
-
 import UIKit
 
 final class MovieQuizPresenter {
@@ -42,5 +36,46 @@ final class MovieQuizPresenter {
         }
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        viewController?.showLoadingIndicator()
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
+            self?.viewController?.hideLoadingIndicator()
+        }
+    }
+    
+    var correctAnswers: Int = 0
+    
+    func showNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            viewController?.statisticService?.store(correct: correctAnswers, total: self.questionsAmount)
+            
+            guard let bestResult = viewController?.statisticService?.bestGame.date.dateTimeString else {
+                return
+            }
+            let text = """
+            Ваш результат: \(correctAnswers)/10
+            Количество сыгранных квизов: \(viewController?.statisticService?.gamesCount ?? 0)
+            Рекорд: \(viewController?.statisticService?.bestGame.correct ?? 0)/10 ( \(bestResult))
+            Средняя точность: \(String(format: "%.2f", viewController?.statisticService?.totalAccuracy ?? 0))%
+            """
+            
+            let viewModel = QuizResultsViewModel(
+                title: "Этот раунд окончен!",
+                text: text,
+                buttonText: "Сыграть ещё раз")
+            viewController?.show(quiz: viewModel)
+        } else {
+            self.switchToNextQuestion()
+            viewController?.questionFactory?.requestNextQuestion()
+        }
+    }
+    
 }
 
