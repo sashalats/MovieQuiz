@@ -9,11 +9,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var noButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-   
+    
     private var correctAnswers = 0
-    
     private let presenter = MovieQuizPresenter()
-    
     private var questionFactory: QuestionFactoryProtocol?
     private var currentQuestion: QuizQuestion?
     private var statisticService: StatisticServiceProtocol?
@@ -26,7 +24,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.titleLabel?.font = UIFont(name: "YSDisplay-medium", size: 20)
         textLabel.font = UIFont(name: "YSDisplay-bold", size: 23)
         counterLabel.font = UIFont(name: "YSDisplay-medium", size: 20)
-        
+        presenter.viewController = self
         
         let questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         //questionFactory.setup(delegate: self)
@@ -74,7 +72,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         currentQuestion = question
         let viewModel = presenter.convert(model: question)
-            showLoadingIndicator()
+        showLoadingIndicator()
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
             self?.hideLoadingIndicator()
@@ -134,15 +132,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             show(quiz: viewModel)
         } else {
             presenter.switchToNextQuestion()
+            
             self.questionFactory?.requestNextQuestion()
         }
     }
     
-    private func changeStateButtons(isEnabled: Bool) {
+    func changeStateButtons(isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         
         if isCorrect {
             correctAnswers += 1
@@ -160,22 +159,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    private func handleAnswer(givenAnswer: Bool) {
-        
-        self.changeStateButtons(isEnabled: false)
-        
-        guard let currentQuestion = currentQuestion else {
-            return
-        }
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-    }
-    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        handleAnswer(givenAnswer: true)
+        presenter.currentQuestion = currentQuestion
+        presenter.handleAnswer(givenAnswer: true)
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        handleAnswer(givenAnswer: false)
+        presenter.currentQuestion = currentQuestion
+        presenter.handleAnswer(givenAnswer: false)
     }
-    
 }
