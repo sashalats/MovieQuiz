@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -10,7 +10,6 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     private var presenter: MovieQuizPresenter!
-    var statisticService: StatisticServiceProtocol?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -21,8 +20,6 @@ final class MovieQuizViewController: UIViewController {
         textLabel.font = UIFont(name: "YSDisplay-bold", size: 23)
         counterLabel.font = UIFont(name: "YSDisplay-medium", size: 20)
         presenter = MovieQuizPresenter(viewController: self)
-        let statisticService = StatisticService()
-        self.statisticService = statisticService
         showLoadingIndicator()
         activityIndicator.hidesWhenStopped = true
     }
@@ -76,18 +73,11 @@ final class MovieQuizViewController: UIViewController {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
-    func showAnswerResult(isCorrect: Bool) {
-        
-        presenter.didAnswer(isCorrectAnswer: isCorrect)
+    
+    func highlightImageBorder(isCorrectAnswer: Bool) {
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            self.presenter.showNextQuestionOrResults()
-            self.changeStateButtons(isEnabled: true)
-        }
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {

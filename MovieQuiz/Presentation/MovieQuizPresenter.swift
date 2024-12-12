@@ -1,16 +1,27 @@
 import UIKit
 
+protocol MovieQuizViewControllerProtocol: AnyObject {
+    func show(quiz step: QuizStepViewModel)
+    func show(quiz result: QuizResultsViewModel)
+    func highlightImageBorder(isCorrectAnswer: Bool)
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
+    func showNetworkError(message: String)
+    func changeStateButtons(isEnabled: Bool)
+}
+
 final class MovieQuizPresenter: QuestionFactoryDelegate {
-    let questionsAmount: Int = 10
-    internal var currentQuestionIndex: Int = 0
-    var currentQuestion: QuizQuestion?
-    private weak var viewController: MovieQuizViewController?
-    var correctAnswers: Int = 0
+    private let questionsAmount: Int = 10
+    private var currentQuestionIndex: Int = 0
+    private var currentQuestion: QuizQuestion?
+    private weak var viewController: MovieQuizViewControllerProtocol?
+    private var correctAnswers: Int = 0
     private var questionFactory: QuestionFactoryProtocol?
+    private let statisticService: StatisticServiceProtocol!
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
-        
+        statisticService = StatisticService()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
         viewController.showLoadingIndicator()
@@ -38,9 +49,21 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return questionStep
     }
     
-    func didAnswer(isCorrectAnswer: Bool) {
+    private func didAnswer(isCorrectAnswer: Bool) {
         if (isCorrectAnswer) {
             correctAnswers += 1
+        }
+    }
+    
+    private func proceedWithAnswer(isCorrect: Bool) {
+        
+        didAnswer(isCorrectAnswer: isCorrect)
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.proceedToNextQuestionOrResults()
+            self.viewController?.changeStateButtons(isEnabled: true)
         }
     }
     
@@ -50,7 +73,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         guard let currentQuestion = currentQuestion else {
             return
         }
-        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -66,18 +89,18 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func showNextQuestionOrResults() {
+    private func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
-            viewController?.statisticService?.store(correct: correctAnswers, total: self.questionsAmount)
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
             
-            guard let bestResult = viewController?.statisticService?.bestGame.date.dateTimeString else {
+            guard let bestResult = statisticService?.bestGame.date.dateTimeString else {
                 return
             }
             let text = """
             Ваш результат: \(correctAnswers)/10
-            Количество сыгранных квизов: \(viewController?.statisticService?.gamesCount ?? 0)
-            Рекорд: \(viewController?.statisticService?.bestGame.correct ?? 0)/10 ( \(bestResult))
-            Средняя точность: \(String(format: "%.2f", viewController?.statisticService?.totalAccuracy ?? 0))%
+            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+            Рекорд: \(statisticService?.bestGame.correct ?? 0)/10 ( \(bestResult))
+            Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0))%
             """
             
             let viewModel = QuizResultsViewModel(
@@ -99,6 +122,4 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     func didFailToLoadData(with error: Error) {
         viewController?.showNetworkError(message: error.localizedDescription)
     }
-    
 }
-

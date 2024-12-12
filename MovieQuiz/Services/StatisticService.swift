@@ -3,7 +3,7 @@ import UIKit
 final class StatisticService: StatisticServiceProtocol {
     private var correctAnswers: Double = 0.0
     private let storage: UserDefaults = .standard
-
+    
     private enum Keys: String {
         case correct
         case bestGame

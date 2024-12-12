@@ -6,6 +6,7 @@ final class AlertPresenter: AlertPresenterProtocol {
     init (delegate: UIViewController) {
         self.delegate = delegate
     }
+    
     func showAlert(result: AlertModel?) {
         let alert = UIAlertController(
             title: result?.title,
@@ -14,7 +15,6 @@ final class AlertPresenter: AlertPresenterProtocol {
         )
         
         alert.view.accessibilityIdentifier = "Game results"
-      
         let action = UIAlertAction(title: result?.buttonText, style: .cancel) { _ in
             result?.completion()
         }
